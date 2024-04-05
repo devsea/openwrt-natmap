@@ -33,8 +33,8 @@ retry_count=0
 # cloudflare_ruleset_id=""
 
 for ((retry_count = 0; retry_count < max_retries; retry_count++)); do
-  local currrent_rule=$(get_current_rule)
-  local cloudflare_ruleset_id=$(echo "$currrent_rule" | jq '.result.id' | sed 's/"//g')
+  currrent_rule=$(get_current_rule)
+  cloudflare_ruleset_id=$(echo "$currrent_rule" | jq '.result.id' | sed 's/"//g')
 
   if [ -z "$cloudflare_ruleset_id" ]; then
     # echo "$GENERAL_NAT_NAME - $LINK_MODE 登录失败,休眠$sleep_time秒"
@@ -43,11 +43,11 @@ for ((retry_count = 0; retry_count < max_retries; retry_count++)); do
     echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功"
     # 修改
     LINK_CLOUDFLARE_ORIGIN_RULE_NAME="\"$LINK_CLOUDFLARE_ORIGIN_RULE_NAME\""
-    local new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$LINK_CLOUDFLARE_ORIGIN_RULE_NAME"')) | .[].key')
+    new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$LINK_CLOUDFLARE_ORIGIN_RULE_NAME"')) | .[].key')
     new_rule=$(echo "$currrent_rule" | jq '.result.rules['"$new_rule"'].action_parameters.origin.port = '"$outter_port"'')
 
     # delete last_updated
-    local body=$(echo "$new_rule" | jq '.result | del(.last_updated)')
+    body=$(echo "$new_rule" | jq '.result | del(.last_updated)')
     curl --request PUT \
       --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/$cloudflare_ruleset_id \
       --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
