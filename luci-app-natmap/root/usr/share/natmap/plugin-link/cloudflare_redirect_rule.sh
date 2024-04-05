@@ -40,9 +40,9 @@ for ((retry_count = 0; retry_count < max_retries; retry_count++)); do
 
     LINK_CLOUDFLARE_REDIRECT_RULE_NAME="\"$LINK_CLOUDFLARE_REDIRECT_RULE_NAME\""
     # replace NEW_PORT with outter_port
-    LINK_CLOUDFLARE_REDIRECT_RULE_TARGET_URL=$(echo $LINK_CLOUDFLARE_REDIRECT_RULE_TARGET_URL | sed 's/NEW_PORT/'"$outter_port"'/g')
+    redirect_rule_target_url=$(echo $LINK_CLOUDFLARE_REDIRECT_RULE_TARGET_URL | sed 's/NEW_PORT/'"$outter_port"'/g')
     new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$LINK_CLOUDFLARE_REDIRECT_RULE_NAME"')) | .[].key')
-    new_rule=$(echo "$currrent_rule" | jq '.result.rules['"$new_rule"'].action_parameters.from_value.target_url.value = "'"$LINK_CLOUDFLARE_REDIRECT_RULE_TARGET_URL"'"')
+    new_rule=$(echo "$currrent_rule" | jq '.result.rules['"$new_rule"'].action_parameters.from_value.target_url.value = "'"$redirect_rule_target_url"'"')
 
     body=$(echo "$new_rule" | jq '.result')
 

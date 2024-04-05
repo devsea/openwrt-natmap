@@ -42,8 +42,8 @@ for ((retry_count = 0; retry_count < max_retries; retry_count++)); do
   else
     echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功"
     # 修改
-    LINK_CLOUDFLARE_ORIGIN_RULE_NAME="\"$LINK_CLOUDFLARE_ORIGIN_RULE_NAME\""
-    new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$LINK_CLOUDFLARE_ORIGIN_RULE_NAME"')) | .[].key')
+    origin_rule_name="\"$LINK_CLOUDFLARE_ORIGIN_RULE_NAME\""
+    new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$origin_rule_name"')) | .[].key')
     new_rule=$(echo "$currrent_rule" | jq '.result.rules['"$new_rule"'].action_parameters.origin.port = '"$outter_port"'')
 
     # delete last_updated
