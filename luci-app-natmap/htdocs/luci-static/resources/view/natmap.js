@@ -237,10 +237,11 @@ return view.extend({
 
     o = s.taboption(
       "forward",
-      form.Password,
+      form.Value,
       "forward_ikuai_password",
       _("Ikuai Password")
     );
+    o.datatype = "string";
     o.modalonly = true;
     o.depends("forward_mode", "ikuai");
 
@@ -628,7 +629,7 @@ return view.extend({
     o.modalonly = true;
     o.depends("link_mode", "qbittorrent");
 
-    o = s.taboption("link", form.Password, "link_qb_password", _("Password"));
+    o = s.taboption("link", form.Value, "link_qb_password", _("Password"));
     o.datatype = "string";
     o.modalonly = true;
     o.depends("link_mode", "qbittorrent");
@@ -667,7 +668,7 @@ return view.extend({
     o.modalonly = true;
     o.depends("link_mode", "transmission");
 
-    o = s.taboption("link", form.Password, "link_tr_password", _("Password"));
+    o = s.taboption("link", form.Value, "link_tr_password", _("Password"));
     o.datatype = "string";
     o.modalonly = true;
     o.depends("link_mode", "transmission");
