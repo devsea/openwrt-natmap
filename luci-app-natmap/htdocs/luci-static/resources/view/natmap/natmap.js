@@ -419,7 +419,9 @@ return view.extend({
       "notify_serverchan_advanced_url",
       _("Self-built Server Url")
     );
-    o.description = _("such as http://127.0.0.1:8080 or http://ikuai.lan:8080 .");
+    o.description = _(
+      "such as http://127.0.0.1:8080 or http://ikuai.lan:8080 ."
+    );
     o.datatype = "string";
     o.modalonly = true;
     o.depends("notify_serverchan_advanced_enable", "1");
