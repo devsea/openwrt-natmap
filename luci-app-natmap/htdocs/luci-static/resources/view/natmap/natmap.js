@@ -509,7 +509,9 @@ return view.extend({
     o.value("transmission", _("Transmission"));
     o.value("cloudflare_origin_rule", _("Cloudflare Origin Rule"));
     o.value("cloudflare_redirect_rule", _("Cloudflare Redirect Rule"));
+    o.value("cloudflare_ddns", _("Cloudflare DDNS"));
 
+    //
     // link_cloudflare
     o = s.taboption(
       "link",
@@ -521,6 +523,7 @@ return view.extend({
     o.modalonly = true;
     o.depends("link_mode", "cloudflare_origin_rule");
     o.depends("link_mode", "cloudflare_redirect_rule");
+    o.depends("link_mode", "cloudflare_ddns");
 
     o = s.taboption(
       "link",
@@ -532,6 +535,35 @@ return view.extend({
     o.modalonly = true;
     o.depends("link_mode", "cloudflare_origin_rule");
     o.depends("link_mode", "cloudflare_redirect_rule");
+    o.depends("link_mode", "cloudflare_ddns");
+
+    //link_cloudflare_ddns
+    o = s.taboption(
+      "link",
+      form.Flag,
+      "link_cloudflare_ddns_type",
+      _("Cloudflare DNS Type")
+    );
+    o.description = _(
+      "Cloudflare DNS Type, eg: AAAA、HTTPS、SRV, default: AAAA，use ip4p."
+    );
+    o.modalonly = true;
+    o.default = "AAAA";
+    o.value("AAAA", _("AAAA (IP4P)"));
+    o.value("HTTPS", _("HTTPS"));
+    o.value("SRV", _("SRV"));
+    o.depends("link_mode", "cloudflare_ddns");
+
+    o = s.taboption(
+      "link",
+      form.Value,
+      "link_cloudflare_ddns_domain",
+      _("Cloudflare DDNS Domain")
+    );
+    o.description = _("Cloudflare DDNS Domain, eg: www@example.com.");
+    o.datatype = "string";
+    o.modalonly = true;
+    o.depends("link_mode", "cloudflare_ddns");
 
     // link_cloudflare_origin_rule
     o = s.taboption(
@@ -698,11 +730,12 @@ return view.extend({
     );
     o.default = false;
     o.modalonly = true;
-    o.depends("link_mode", "transmission");
-    o.depends("link_mode", "qbittorrent");
-    o.depends("link_mode", "emby");
-    o.depends("link_mode", "cloudflare_origin_rule");
-    o.depends("link_mode", "cloudflare_redirect_rule");
+    // o.depends("link_mode", "transmission");
+    // o.depends("link_mode", "qbittorrent");
+    // o.depends("link_mode", "emby");
+    // o.depends("link_mode", "cloudflare_origin_rule");
+    // o.depends("link_mode", "cloudflare_redirect_rule");
+    // o.depends("link_mode", "cloudflare_ddns");
 
     o = s.taboption(
       "link",

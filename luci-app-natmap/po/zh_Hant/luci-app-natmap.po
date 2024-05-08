@@ -400,3 +400,15 @@ msgid "if want to use natmap outter_port,NEW_PORT must be used instead of the po
 msgstr "如果想要使用 natmap 的 外部端口 outter_port ,则使用 NEW_PORT 替代 URL 中的端口，例如 http://1.2.3.4:1234/NEW_PORT/abc 。"        
 
 
+
+msgid "Cloudflare DNS Type"
+msgstr "Cloudflare DNS 类型"
+
+msgid "Cloudflare DNS Type, eg: AAAA、HTTPS、SRV, default: AAAA，use ip4p."
+msgstr "Cloudflare DNS 类型，例如： AAAA、HTTPS、SRV，默认为AAAA，使用 ip4p 。"
+
+msgid "Cloudflare DDNS Domain"
+msgstr "Cloudflare DDNS 域名"
+
+msgid "Cloudflare DDNS Domain, eg: www@example.com."
+msgstr "Cloudflare DDNS 域名，例如：www@example.com 。"

@@ -8,7 +8,7 @@ function get_current_rule() {
   curl --request GET \
     --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/phases/http_request_dynamic_redirect/entrypoint \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-    --header 'Content-Type: application/json'
+    --header 'Content-Type: application/json' >/dev/null 2>/dev/null
 }
 
 # 默认重试次数为1，休眠时间为3s
@@ -24,11 +24,13 @@ if [ "$LINK_ADVANCED_ENABLE" == 1 ] && [ -n "$LINK_ADVANCED_MAX_RETRIES" ] && [ 
 fi
 
 # 初始化参数
-# currrent_rule=""
-retry_count=0
-# cloudflare_ruleset_id=""
 
-for ((retry_count = 0; retry_count < max_retries; retry_count++)); do
+retry_count=0
+currrent_rule=""
+cloudflare_ruleset_id=""
+
+# 获取cloudflare redirect rule id
+for ((retry_count < max_retries; retry_count++; )); do
   currrent_rule=$(get_current_rule)
   cloudflare_ruleset_id=$(echo "$currrent_rule" | jq '.result.id' | sed 's/"//g')
 
@@ -37,24 +39,35 @@ for ((retry_count = 0; retry_count < max_retries; retry_count++)); do
     sleep $sleep_time
   else
     echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功"
+    break
+  fi
+done
 
-    LINK_CLOUDFLARE_REDIRECT_RULE_NAME="\"$LINK_CLOUDFLARE_REDIRECT_RULE_NAME\""
-    # replace NEW_PORT with outter_port
-    redirect_rule_target_url=$(echo $LINK_CLOUDFLARE_REDIRECT_RULE_TARGET_URL | sed 's/NEW_PORT/'"$outter_port"'/g')
-    new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$LINK_CLOUDFLARE_REDIRECT_RULE_NAME"')) | .[].key')
-    new_rule=$(echo "$currrent_rule" | jq '.result.rules['"$new_rule"'].action_parameters.from_value.target_url.value = "'"$redirect_rule_target_url"'"')
+# update cloudflare redirect rule
+for ((retry_count < max_retries; retry_count++; )); do
+  cloudflare_redirect_rule_name="\"$LINK_CLOUDFLARE_REDIRECT_RULE_NAME\""
+  # replace NEW_PORT with outter_port
+  redirect_rule_target_url=$(echo $LINK_CLOUDFLARE_REDIRECT_RULE_TARGET_URL | sed 's/NEW_PORT/'"$outter_port"'/g')
+  new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$cloudflare_redirect_rule_name"')) | .[].key')
+  new_rule=$(echo "$currrent_rule" | jq '.result.rules['"$new_rule"'].action_parameters.from_value.target_url.value = "'"$redirect_rule_target_url"'"')
 
-    body=$(echo "$new_rule" | jq '.result')
+  body=$(echo "$new_rule" | jq '.result')
 
-    # delete last_updated
-    body=$(echo "$body" | jq 'del(.last_updated)')
-    curl --request PUT \
-      --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/$cloudflare_ruleset_id \
-      --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-      --header 'Content-Type: application/json' \
-      --data "$body"
+  # delete last_updated
+  body=$(echo "$body" | jq 'del(.last_updated)')
+  result=$(curl --request PUT \
+    --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/$cloudflare_ruleset_id \
+    --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
+    --header 'Content-Type: application/json' \
+    --data "$body" >/dev/null 2>/dev/null)
+
+  if [ "$(echo "$result" | jq '.success' | sed 's/"//g')" == "true" ]; then
+    echo "$GENERAL_NAT_NAME - $LINK_MODE 更新成功"
 
     break
+  else
+    # echo "$GENERAL_NAT_NAME - $LINK_MODE 修改失败,休眠$sleep_time秒"
+    sleep $sleep_time
   fi
 done
 
