@@ -26,7 +26,7 @@ dns_record_id=""
 # 获取cloudflare dns记录的dns_record
 for (( ; retry_count < max_retries; retry_count++)); do
   dns_record=$(curl --request GET \
-    --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_record?name=$LINK_CLOUDFLARE_DDNS_DOMAIN \
+    --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records?name=$LINK_CLOUDFLARE_DDNS_DOMAIN \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
     --header 'Content-Type: application/json')
 
@@ -49,13 +49,15 @@ for (( ; retry_count < max_retries; retry_count++)); do
 done
 
 # 更新cloudflare的dns记录
+request_data="{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}"
+
 for (( ; retry_count < max_retries; retry_count++)); do
   result=$(
     curl --request PUT \
-      --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_record/$dns_record_id \
+      --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records/$dns_record_id \
       --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
       --header 'Content-Type: application/json' \
-      --data "{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}"
+      --data "$request_data"
   )
 
   # 判断api是否调用成功,返回参数success是否为true
