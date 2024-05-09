@@ -604,7 +604,7 @@ return view.extend({
         "can used with ddns to redirect to the specified URL, such as http://1.2.3.4:1234 or http://abc.com:1234/abc ."
       ) +
       _(
-        "<br />if want to use natmap outter_port,NEW_PORT must be used instead of the port in the URL, such as http://1.2.3.4:1234/NEW_PORT/abc"
+        "<br />if want to use natmap outter_port, NEW_PORT must be used instead of the port in the URL, such as http://1.2.3.4:1234/NEW_PORT/abc ."
       );
     o.datatype = "string";
     o.modalonly = true;
@@ -617,7 +617,7 @@ return view.extend({
       "link_emby_url",
       _("EMBY URL"),
       _(
-        "such as http://127.0.0.1:8080 or http://ikuai.lan:8080.if use host,must close Rebind protection in DHCP/DNS"
+        "such as http://127.0.0.1:8080 or http://ikuai.lan:8080.if use host,must close Rebind protection in DHCP/DNS."
       )
     );
     o.datatype = "string";

@@ -288,8 +288,8 @@ msgid "can used with ddns to redirect to the specified URL, such as http://1.2.3
 msgstr "可以配合 ddns 使用，重定向到指定 URL ，例如 http://1.2.3.4:1234 或 http://abc.com:1234/abc 。"
 
 #: natmap.js
-msgid "if want to use natmap outter_port,NEW_PORT must be used instead of the port in the URL, such as http://1.2.3.4:1234/NEW_PORT/abc ."
-msgstr "如果想要使用 natmap 的 外部端口 outter_port ,则使用 NEW_PORT 替代 URL 中的端口，例如 http://1.2.3.4:1234/NEW_PORT/abc 。"        
+msgid "<br />if want to use natmap outter_port, NEW_PORT must be used instead of the port in the URL, such as http://1.2.3.4:1234/NEW_PORT/abc ."
+msgstr "<br />如果想要使用 natmap 的 外部端口 outter_port ，则使用 NEW_PORT 替代 URL 中的端口，例如 http://1.2.3.4:1234/NEW_PORT/abc 。"        
 
 #: natmap.js:97
 msgid "Restrict to address family"
