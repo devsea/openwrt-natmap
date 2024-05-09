@@ -58,6 +58,7 @@ return view.extend({
     s = m.section(form.GridSection, "natmap");
     s.addremove = true;
     s.anonymous = true;
+    s.sortable = true;
 
     s.tab("general", _("General Settings"));
     s.tab("forward", _("Forward Settings"));
@@ -182,7 +183,7 @@ return view.extend({
       "forward_target_ip",
       _("Forward target")
     );
-    o.datatype = "host";
+    o.datatype = "ip4addr";
     o.modalonly = true;
     o.depends("forward_mode", "firewall");
     o.depends("forward_mode", "natmap");
@@ -288,6 +289,7 @@ return view.extend({
       _("max retries,default 0 means execute only once")
     );
     o.datatype = "uinteger";
+    o.default = 0;
     o.modalonly = true;
     o.depends("forward_advanced_enable", "1");
 
@@ -299,6 +301,7 @@ return view.extend({
       _("Retry Interval, unit is seconds, default 0 is 3 seconds")
     );
     o.datatype = "uinteger";
+    o.default = 0;
     o.modalonly = true;
     o.depends("forward_advanced_enable", "1");
 
@@ -480,6 +483,7 @@ return view.extend({
       _("max retries,default 0 means execute only once")
     );
     o.datatype = "uinteger";
+    o.default = 0;
     o.modalonly = true;
     o.depends("notify_advanced_enable", "1");
 
@@ -491,6 +495,7 @@ return view.extend({
       _("Retry Interval, unit is seconds, default 0 is 3 seconds")
     );
     o.datatype = "uinteger";
+    o.default = 0;
     o.modalonly = true;
     o.depends("notify_advanced_enable", "1");
 
@@ -540,12 +545,12 @@ return view.extend({
     //link_cloudflare_ddns
     o = s.taboption(
       "link",
-      form.Flag,
+      form.ListValue,
       "link_cloudflare_ddns_type",
       _("Cloudflare DNS Type")
     );
     o.description = _(
-      "Cloudflare DNS Type, eg: AAAA、HTTPS、SRV, default: AAAA，use ip4p."
+      "cloudflare dns type, eg: AAAA、HTTPS、SRV, default: AAAA(IP4P)."
     );
     o.modalonly = true;
     o.default = "AAAA";
@@ -560,8 +565,8 @@ return view.extend({
       "link_cloudflare_ddns_domain",
       _("Cloudflare DDNS Domain")
     );
-    o.description = _("Cloudflare DDNS Domain, eg: www@example.com.");
-    o.datatype = "string";
+    o.description = _("cloudflare ddns domain, eg: www@example.com.");
+    o.datatype = "host";
     o.modalonly = true;
     o.depends("link_mode", "cloudflare_ddns");
 
@@ -678,7 +683,7 @@ return view.extend({
       "link_qb_ipv6_address",
       _("IPv6 Address")
     );
-    o.datatype = "string";
+    o.datatype = "ip6addr";
     o.modalonly = true;
     o.depends("link_qb_allow_ipv6", "1");
 
@@ -717,7 +722,7 @@ return view.extend({
       "link_tr_ipv6_address",
       _("IPv6 Address")
     );
-    o.datatype = "string";
+    o.datatype = "ip6addr";
     o.modalonly = true;
     o.depends("link_tr_allow_ipv6", "1");
 
@@ -745,6 +750,7 @@ return view.extend({
       _("max retries,default 0 means execute only once")
     );
     o.datatype = "uinteger";
+    o.default = 0;
     o.modalonly = true;
     o.depends("link_advanced_enable", "1");
 
@@ -756,6 +762,7 @@ return view.extend({
       _("Retry Interval, unit is seconds, default 0 is 3 seconds")
     );
     o.datatype = "uinteger";
+    o.default = 0;
     o.modalonly = true;
     o.depends("link_advanced_enable", "1");
 

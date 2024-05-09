@@ -402,11 +402,11 @@ msgstr "网页 URL"
 msgid "Cloudflare DNS Type"
 msgstr "Cloudflare DNS 类型"
 
-msgid "Cloudflare DNS Type, eg: AAAA、HTTPS、SRV, default: AAAA，use ip4p."
-msgstr "Cloudflare DNS 类型，例如： AAAA、HTTPS、SRV，默认为AAAA，使用 ip4p 。"
+msgid "cloudflare dns type, eg: AAAA、HTTPS、SRV, default: AAAA(IP4P)."
+msgstr "cloudflare dns 类型，例如： AAAA、HTTPS、SRV，默认为AAAA(IP4P)。"
 
 msgid "Cloudflare DDNS Domain"
 msgstr "Cloudflare DDNS 域名"
 
-msgid "Cloudflare DDNS Domain, eg: www@example.com."
-msgstr "Cloudflare DDNS 域名，例如：www@example.com 。"
+msgid "cloudflare ddns domain, eg: www@example.com."
+msgstr "cloudflare ddns 域名，例如：www@example.com。"
