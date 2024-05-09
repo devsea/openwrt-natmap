@@ -35,10 +35,10 @@ for ((retry_count < max_retries; retry_count++; )); do
   cloudflare_ruleset_id=$(echo "$currrent_rule" | jq '.result.id' | sed 's/"//g')
 
   if [ -z "$cloudflare_ruleset_id" ]; then
-    # echo "$LINK_MODE 登录失败,休眠$sleep_time秒"
+    echo "$LINK_MODE 登录失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
     sleep $sleep_time
   else
-    echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功"
+    echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功" >>/var/log/natmap/natmap.log
     break
   fi
 done
@@ -62,17 +62,17 @@ for ((retry_count < max_retries; retry_count++; )); do
     --data "$body" >/dev/null 2>/dev/null)
 
   if [ "$(echo "$result" | jq '.success' | sed 's/"//g')" == "true" ]; then
-    echo "$GENERAL_NAT_NAME - $LINK_MODE 更新成功"
+    echo "$GENERAL_NAT_NAME - $LINK_MODE 更新成功" >>/var/log/natmap/natmap.log
 
     break
   else
-    # echo "$GENERAL_NAT_NAME - $LINK_MODE 修改失败,休眠$sleep_time秒"
+    echo "$GENERAL_NAT_NAME - $LINK_MODE 修改失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
     sleep $sleep_time
   fi
 done
 
 # Check if maximum retries reached
 if [ $retry_count -eq $max_retries ]; then
-  echo "$GENERAL_NAT_NAME - $LINK_MODE 达到最大重试次数，无法修改"
+  echo "$GENERAL_NAT_NAME - $LINK_MODE 达到最大重试次数，无法修改" >>/var/log/natmap/natmap.log
   exit 1
 fi

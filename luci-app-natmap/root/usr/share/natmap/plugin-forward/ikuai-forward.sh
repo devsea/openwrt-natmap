@@ -13,7 +13,7 @@ protocol=$5
 mapping_lan_port=""
 # 如果$FORWARD_TARGET_PORT为空或者$FORWARD_TARGET_PORT为0则退出
 if [ -z "${FORWARD_TARGET_PORT}" ] || [ "${FORWARD_TARGET_PORT}" -eq 0 ]; then
-  echo "FORWARD_TARGET_PORT is empty,set to outter_port"
+  echo "FORWARD_TARGET_PORT is empty,set to outter_port" >>/var/log/natmap/natmap.log
   mapping_lan_port=$outter_port
 else
   mapping_lan_port=${FORWARD_TARGET_PORT}
@@ -204,13 +204,13 @@ for ((retry_count = 0; retry_count <= max_retries; retry_count++)); do
       add_response=$(add_mapping_action "$cookie" "$comment")
       # Check if the modification was successful
       if [ "$(echo "$add_response" | jq -r '.ErrMsg')" = "Success" ]; then
-        echo "$GENERAL_NAT_NAME - $FORWARD_MODE Port mapping modified successfully"
+        echo "$GENERAL_NAT_NAME - $FORWARD_MODE Port mapping modified successfully" >>/var/log/natmap/natmap.log
         break
       else
-        echo "$GENERAL_NAT_NAME - $FORWARD_MODE Failed to modify the port mapping"
+        echo "$GENERAL_NAT_NAME - $FORWARD_MODE Failed to modify the port mapping" >>/var/log/natmap/natmap.log
       fi
     else
-      echo "$GENERAL_NAT_NAME - $FORWARD_MODE Failed to delete the port mapping"
+      echo "$GENERAL_NAT_NAME - $FORWARD_MODE Failed to delete the port mapping" >>/var/log/natmap/natmap.log
     fi
   fi
   # echo "$FORWARD_MODE 修改失败,休眠$sleep_time秒"
@@ -219,6 +219,6 @@ done
 
 # Check if maximum retries reached
 if [ $retry_count -eq $max_retries ]; then
-  echo "$GENERAL_NAT_NAME - $FORWARD_MODE 达到最大重试次数，无法修改"
+  echo "$GENERAL_NAT_NAME - $FORWARD_MODE 达到最大重试次数，无法修改" >>/var/log/natmap/natmap.log
   exit 1
 fi
