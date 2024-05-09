@@ -37,6 +37,7 @@ for (( ; retry_count < max_retries; retry_count++)); do
     for ((i = 0; i < $dns_record_num; i++)); do
       if [ "$(echo "$dns_record" | jq ".result[$i].type" | sed 's/"//g')" == "$dns_type" ]; then
         dns_record_id=$(echo "$dns_record" | jq ".result[$i].id" | sed 's/"//g')
+        echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功" >>/var/log/natmap/natmap.log
         break
       fi
     done
@@ -48,9 +49,8 @@ for (( ; retry_count < max_retries; retry_count++)); do
 done
 
 # 判断是否成功获得dns_record_id
-if [! -z "$dns_record_id" ]; then
-  echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功" >>/var/log/natmap/natmap.log
-
+# 如果$dns_record_id不为空，则创建cloudflare的dns记录
+if [ ! -z "$dns_record_id" ]; then
   # 更新cloudflare的dns记录
   request_data="{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}"
 
@@ -72,6 +72,9 @@ if [! -z "$dns_record_id" ]; then
       sleep $sleep_time
     fi
   done
+else
+  echo "$GENERAL_NAT_NAME - $LINK_MODE 始终登录失败或不存在相应DNS记录" >>/var/log/natmap/natmap.log
+  exit 1
 fi
 
 # Check if maximum retries reached
