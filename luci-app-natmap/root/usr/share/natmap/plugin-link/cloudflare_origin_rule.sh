@@ -12,7 +12,7 @@ function get_current_rule() {
   curl --request GET \
     --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/phases/http_request_origin/entrypoint \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-    --header 'Content-Type: application/json' >/dev/null 2>/dev/null
+    --header 'Content-Type: application/json'
 }
 
 # 默认重试次数为1，休眠时间为3s
@@ -34,7 +34,7 @@ currrent_rule=""
 cloudflare_ruleset_id=""
 
 # 获取cloudflare origin rule id
-for ((retry_count < max_retries; retry_count++; )); do
+for (( ; retry_count < max_retries; retry_count++)); do
   currrent_rule=$(get_current_rule)
   cloudflare_ruleset_id=$(echo "$currrent_rule" | jq '.result.id' | sed 's/"//g')
 
@@ -48,7 +48,7 @@ for ((retry_count < max_retries; retry_count++; )); do
 done
 
 # 修改 origin rule
-for ((retry_count < max_retries; retry_count++; )); do
+for (( ; retry_count < max_retries; retry_count++)); do
 
   origin_rule_name="\"$LINK_CLOUDFLARE_ORIGIN_RULE_NAME\""
   new_rule=$(echo "$currrent_rule" | jq '.result.rules| to_entries | map(select(.value.description == '"$origin_rule_name"')) | .[].key')
@@ -60,7 +60,7 @@ for ((retry_count < max_retries; retry_count++; )); do
     --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/$cloudflare_ruleset_id \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
     --header 'Content-Type: application/json' \
-    --data "$body" >/dev/null 2>/dev/null)
+    --data "$body")
 
   if [ "$(echo "$result" | jq '.success' | sed 's/"//g')" == "true" ]; then
     echo "$GENERAL_NAT_NAME - $LINK_MODE 更新成功" >>/var/log/natmap/natmap.log

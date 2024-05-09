@@ -198,7 +198,7 @@ for ((retry_count = 0; retry_count <= max_retries; retry_count++)); do
 
     # 验证对应端口映射是否全部删除
     if [ ${#dnat_ids[@]} -eq 0 ]; then
-      # echo "$GENERAL_NAT_NAME - $FORWARD_MODE Port mapping deleted successfully"
+      echo "$GENERAL_NAT_NAME - $FORWARD_MODE Port mapping deleted successfully"
 
       # 添加端口映射
       add_response=$(add_mapping_action "$cookie" "$comment")
@@ -213,7 +213,7 @@ for ((retry_count = 0; retry_count <= max_retries; retry_count++)); do
       echo "$GENERAL_NAT_NAME - $FORWARD_MODE Failed to delete the port mapping" >>/var/log/natmap/natmap.log
     fi
   fi
-  # echo "$FORWARD_MODE 修改失败,休眠$sleep_time秒"
+  echo "$GENERAL_NAT_NAME - $FORWARD_MODE 修改失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
   sleep $sleep_time
 done
 

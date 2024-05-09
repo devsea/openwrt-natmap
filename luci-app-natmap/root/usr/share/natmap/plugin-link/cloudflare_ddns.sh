@@ -24,12 +24,20 @@ dns_record=""
 dns_record_id=""
 
 # 获取cloudflare dns记录的dns_record
-for ((retry_count < max_retries; retry_count++; )); do
+for (( ; retry_count < max_retries; retry_count++)); do
   dns_record=$(curl --request GET \
     --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_record?name=$LINK_CLOUDFLARE_DDNS_DOMAIN \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-    --header 'Content-Type: application/json' >/dev/null 2>/dev/null)
-  dns_record_id=$(echo "$dns_record" | jq '.result[0].id' | sed 's/"//g')
+    --header 'Content-Type: application/json')
+
+  # 获取与dns_type匹配的dns_record_id
+  dns_record_num=$(echo "$dns_record" | jq '.result_info.count')
+  for ((i = 0; i < $dns_record_num; i++)); do
+    if [ "$(echo "$dns_record" | jq ".result[$i].type" | sed 's/"//g')" == "$dns_type" ]; then
+      dns_record_id=$(echo "$dns_record" | jq ".result[$i].id" | sed 's/"//g')
+      break
+    fi
+  done
 
   if [ -z "$dns_record_id" ]; then
     echo "$GENERAL_NAT_NAME - $LINK_MODE 登录失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
@@ -41,13 +49,13 @@ for ((retry_count < max_retries; retry_count++; )); do
 done
 
 # 更新cloudflare的dns记录
-for ((retry_count < max_retries; retry_count++; )); do
+for (( ; retry_count < max_retries; retry_count++)); do
   result=$(
     curl --request PUT \
       --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_record/$dns_record_id \
       --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
       --header 'Content-Type: application/json' \
-      --data "{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}" >/dev/null 2>/dev/null
+      --data "{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}"
   )
 
   # 判断api是否调用成功,返回参数success是否为true
