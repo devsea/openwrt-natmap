@@ -30,45 +30,49 @@ for (( ; retry_count < max_retries; retry_count++)); do
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
     --header 'Content-Type: application/json')
 
-  # 获取与dns_type匹配的dns_record_id
-  dns_record_num=$(echo "$dns_record" | jq '.result_info.count')
-  for ((i = 0; i < $dns_record_num; i++)); do
-    if [ "$(echo "$dns_record" | jq ".result[$i].type" | sed 's/"//g')" == "$dns_type" ]; then
-      dns_record_id=$(echo "$dns_record" | jq ".result[$i].id" | sed 's/"//g')
-      break
-    fi
-  done
-
-  if [ -z "$dns_record_id" ]; then
+  # 判断是否成功获取响应
+  if [ "$(echo "$dns_record" | jq '.success' | sed 's/"//g')" == "true" ]; then
+    # 获取与dns_type匹配的dns_record_id
+    dns_record_num=$(echo "$dns_record" | jq '.result_info.count')
+    for ((i = 0; i < $dns_record_num; i++)); do
+      if [ "$(echo "$dns_record" | jq ".result[$i].type" | sed 's/"//g')" == "$dns_type" ]; then
+        dns_record_id=$(echo "$dns_record" | jq ".result[$i].id" | sed 's/"//g')
+        break
+      fi
+    done
+    break
+  else
     echo "$GENERAL_NAT_NAME - $LINK_MODE 登录失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
     sleep $sleep_time
-  else
-    echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功" >>/var/log/natmap/natmap.log
-    break
   fi
 done
 
-# 更新cloudflare的dns记录
-request_data="{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}"
+# 判断是否成功获得dns_record_id
+if [! -z "$dns_record_id" ]; then
+  echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功" >>/var/log/natmap/natmap.log
 
-for (( ; retry_count < max_retries; retry_count++)); do
-  result=$(
-    curl --request PUT \
-      --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records/$dns_record_id \
-      --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-      --header 'Content-Type: application/json' \
-      --data "$request_data"
-  )
+  # 更新cloudflare的dns记录
+  request_data="{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}"
 
-  # 判断api是否调用成功,返回参数success是否为true
-  if [ "$(echo "$result" | jq '.success' | sed 's/"//g')" == "true" ]; then
-    echo "$GENERAL_NAT_NAME - $LINK_MODE 更新成功" >>/var/log/natmap/natmap.log
-    break
-  else
-    echo "$GENERAL_NAT_NAME - $LINK_MODE 修改失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
-    sleep $sleep_time
-  fi
-done
+  for (( ; retry_count < max_retries; retry_count++)); do
+    result=$(
+      curl --request PUT \
+        --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records/$dns_record_id \
+        --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
+        --header 'Content-Type: application/json' \
+        --data "$request_data"
+    )
+
+    # 判断api是否调用成功,返回参数success是否为true
+    if [ "$(echo "$result" | jq '.success' | sed 's/"//g')" == "true" ]; then
+      echo "$GENERAL_NAT_NAME - $LINK_MODE 更新成功" >>/var/log/natmap/natmap.log
+      break
+    else
+      echo "$GENERAL_NAT_NAME - $LINK_MODE 修改失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
+      sleep $sleep_time
+    fi
+  done
+fi
 
 # Check if maximum retries reached
 if [ $retry_count -eq $max_retries ]; then
