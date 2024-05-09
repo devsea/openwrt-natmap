@@ -566,7 +566,7 @@ return view.extend({
       _("Cloudflare DDNS Domain")
     );
     o.description =
-      _("cloudflare ddns domain, eg: www@example.com.") +
+      _("cloudflare ddns domain, eg: www.example.com.") +
       _("<br />before use it, must add dns record in cloudflare DNS.");
     o.datatype = "host";
     o.modalonly = true;

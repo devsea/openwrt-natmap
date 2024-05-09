@@ -408,8 +408,8 @@ msgstr "cloudflare dns 类型，例如： AAAA、HTTPS、SRV，默认为AAAA(IP4
 msgid "Cloudflare DDNS Domain"
 msgstr "Cloudflare DDNS 域名"
 
-msgid "cloudflare ddns domain, eg: www@example.com."
-msgstr "cloudflare ddns 域名，例如：www@example.com。"
+msgid "cloudflare ddns domain, eg: www.example.com."
+msgstr "cloudflare ddns 域名，例如：www.example.com。"
 
 msgid "<br />before use it, must add dns record in cloudflare DNS."
 msgstr "<br />使用之前，必须在 cloudflare dns 中添加对应dns记录。"
