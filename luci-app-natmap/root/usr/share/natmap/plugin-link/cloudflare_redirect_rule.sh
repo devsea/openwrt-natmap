@@ -6,9 +6,9 @@ outter_port=$2
 
 function get_current_rule() {
   curl --request GET \
-    --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/phases/http_request_dynamic_redirect/entrypoint \
+    --url "https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/phases/http_request_dynamic_redirect/entrypoint" \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-    --header 'Content-Type: application/json'
+    --header "Content-Type: application/json"
 }
 
 # 默认重试次数为1，休眠时间为3s
@@ -56,9 +56,9 @@ for (( ; retry_count < max_retries; retry_count++)); do
   # delete last_updated
   body=$(echo "$body" | jq 'del(.last_updated)')
   result=$(curl --request PUT \
-    --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/$cloudflare_ruleset_id \
+    --url "https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/$cloudflare_ruleset_id" \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-    --header 'Content-Type: application/json' \
+    --header "Content-Type: application/json" \
     --data "$body")
 
   if [ "$(echo "$result" | jq '.success' | sed 's/"//g')" == "true" ]; then

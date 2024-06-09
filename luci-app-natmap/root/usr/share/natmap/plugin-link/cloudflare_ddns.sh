@@ -19,28 +19,22 @@ fi
 
 # 初始化参数
 retry_count=0
-dns_type="AAAA"
+dns_type=$LINK_CLOUDFLARE_DDNS_TYPE
 dns_record=""
 dns_record_id=""
 
 # 获取cloudflare dns记录的dns_record
 for (( ; retry_count < max_retries; retry_count++)); do
   dns_record=$(curl --request GET \
-    --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records?name=$LINK_CLOUDFLARE_DDNS_DOMAIN \
+    --url "https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records?name=$LINK_CLOUDFLARE_DDNS_DOMAIN&type=$dns_type" \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-    --header 'Content-Type: application/json')
+    --header "Content-Type: application/json")
 
   # 判断是否成功获取响应
   if [ "$(echo "$dns_record" | jq '.success' | sed 's/"//g')" == "true" ]; then
     # 获取与dns_type匹配的dns_record_id
-    dns_record_num=$(echo "$dns_record" | jq '.result_info.count')
-    for ((i = 0; i < $dns_record_num; i++)); do
-      if [ "$(echo "$dns_record" | jq ".result[$i].type" | sed 's/"//g')" == "$dns_type" ]; then
-        dns_record_id=$(echo "$dns_record" | jq ".result[$i].id" | sed 's/"//g')
-        echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功" >>/var/log/natmap/natmap.log
-        break
-      fi
-    done
+    dns_record_id=$(echo "$dns_record" | jq ".result[0].id" | sed 's/"//g')
+    echo "$GENERAL_NAT_NAME - $LINK_MODE 登录成功" >>/var/log/natmap/natmap.log
     break
   else
     echo "$GENERAL_NAT_NAME - $LINK_MODE 登录失败,休眠$sleep_time秒" >>/var/log/natmap/natmap.log
@@ -52,14 +46,30 @@ done
 # 如果$dns_record_id不为空，则创建cloudflare的dns记录
 if [ ! -z "$dns_record_id" ]; then
   # 更新cloudflare的dns记录
-  request_data="{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"$ip4p\",\"ttl\":60,\"proxied\":false}"
+  request_data=""
+  case $dns_type in
+  "AAAA")
+    request_data="{
+          \"type\":\"$dns_type\",
+          \"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",
+          \"content\":\"$ip4p\",
+          \"ttl\":60,
+          \"proxied\":false
+        }"
+    ;;
+  "HTTPS")
+    request_data="{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"ipv4hint="$outter_ip" port="$outter_port"\",\"ttl\":60,\"proxied\":false}"
+    ;;
+  "SRV") ;;
+  *) ;;
+  esac
 
   for (( ; retry_count < max_retries; retry_count++)); do
     result=$(
       curl --request PUT \
-        --url https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records/$dns_record_id \
+        --url "https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/dns_records/$dns_record_id" \
         --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
-        --header 'Content-Type: application/json' \
+        --header "Content-Type: application/json" \
         --data "$request_data"
     )
 

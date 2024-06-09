@@ -572,6 +572,18 @@ return view.extend({
     o.modalonly = true;
     o.depends("link_mode", "cloudflare_ddns");
 
+    o = s.taboption(
+      "link",
+      form.Value,
+      "link_cloudflare_ddns_https_priority",
+      _("HTTPS Priority"),
+      _("Priority of HTTPS-DNS-TYPE, default 10.")
+    );
+    o.datatype = "uinteger";
+    o.default = 10;
+    o.modalonly = true;
+    o.depends("link_cloudflare_ddns_type", "HTTPS");
+
     // link_cloudflare_origin_rule
     o = s.taboption(
       "link",
