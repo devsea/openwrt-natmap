@@ -576,9 +576,9 @@ return view.extend({
       "link",
       form.Value,
       "link_cloudflare_ddns_https_priority",
-      _("HTTPS Priority"),
-      _("Priority of HTTPS-DNS-TYPE, default 10.")
+      _("HTTPS record Priority")
     );
+    o.description = _("Priority of HTTPS record, default 10.");
     o.datatype = "uinteger";
     o.default = 10;
     o.modalonly = true;

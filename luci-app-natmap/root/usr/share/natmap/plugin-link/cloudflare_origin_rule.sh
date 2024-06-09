@@ -55,12 +55,12 @@ for (( ; retry_count < max_retries; retry_count++)); do
   new_rule=$(echo "$currrent_rule" | jq '.result.rules['"$new_rule"'].action_parameters.origin.port = '"$outter_port"'')
 
   # delete last_updated
-  body=$(echo "$new_rule" | jq '.result | del(.last_updated)')
+  request_data=$(echo "$new_rule" | jq '.result | del(.last_updated)')
   result=$(curl --request PUT \
     --url "https://api.cloudflare.com/client/v4/zones/$LINK_CLOUDFLARE_ZONE_ID/rulesets/$cloudflare_ruleset_id" \
     --header "Authorization: Bearer $LINK_CLOUDFLARE_TOKEN" \
     --header "Content-Type: application/json" \
-    --data "$body")
+    --data "$request_data")
 
   if [ "$(echo "$result" | jq '.success' | sed 's/"//g')" == "true" ]; then
     echo "$GENERAL_NAT_NAME - $LINK_MODE 更新成功" >>/var/log/natmap/natmap.log

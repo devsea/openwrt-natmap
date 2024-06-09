@@ -45,25 +45,39 @@ done
 # 判断是否成功获得dns_record_id
 # 如果$dns_record_id不为空，则创建cloudflare的dns记录
 if [ ! -z "$dns_record_id" ]; then
-  # 更新cloudflare的dns记录
+  # 构建请求数据
   request_data=""
   case $dns_type in
   "AAAA")
     request_data="{
-          \"type\":\"$dns_type\",
-          \"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",
-          \"content\":\"$ip4p\",
-          \"ttl\":60,
-          \"proxied\":false
-        }"
+                \"type\": \"$dns_type\",
+                \"name\": \"$LINK_CLOUDFLARE_DDNS_DOMAIN\",
+                \"content\": \"$ip4p\",
+                \"ttl\": 60,
+                \"proxied\": false
+            }"
     ;;
   "HTTPS")
-    request_data="{\"type\":\"$dns_type\",\"name\":\"$LINK_CLOUDFLARE_DDNS_DOMAIN\",\"content\":\"ipv4hint="$outter_ip" port="$outter_port"\",\"ttl\":60,\"proxied\":false}"
+    request_data="{
+                \"name\": \"$LINK_CLOUDFLARE_DDNS_DOMAIN\",
+                \"type\": \"$dns_type\",
+                \"proxied\": false,
+                \"ttl\": 60,
+                \"data\":{
+                    \"priority\": $LINK_CLOUDFLARE_DDNS_HTTPS_PRIORITY,
+                    \"target\": \".\",
+                    \"value\": \"ipv4hint=\\\"$outter_ip\\\" port=\\\"$outter_port\\\"\"
+                }}"
     ;;
-  "SRV") ;;
-  *) ;;
+  "SRV")
+    dns_type="SRV"
+    ;;
+  *)
+    request_data=""
+    ;;
   esac
 
+  # 更新cloudflare的dns记录
   for (( ; retry_count < max_retries; retry_count++)); do
     result=$(
       curl --request PUT \
