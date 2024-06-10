@@ -34,11 +34,13 @@ headers='{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 # 登录ikuai
 # This function performs the login action
 # Parameters:
-#   - login_username: username for login
-#   - login_password: password for login
-function login_action() {
-  local login_username="$1"
-  local login_password="$2"
+#   - local_login_username: username for login
+#   - local_login_password: password for login
+# Returns:
+#   - The cookie for authentication
+function get_login_cookie() {
+  local local_login_username="$1"
+  local local_login_password="$2"
 
   # Calculate the MD5 hash value of the password and convert it to hexadecimal
   local passwd=$(echo -n "$login_password" | openssl dgst -md5 -hex | awk '{print $2}')
