@@ -6,19 +6,11 @@ outter_port=$2
 ip4p=$3
 
 # 默认重试次数为1，休眠时间为3s
-max_retries=1
-sleep_time=3
-
-# 判断是否开启高级功能
-if [ "$LINK_ADVANCED_ENABLE" == 1 ] && [ -n "$LINK_ADVANCED_MAX_RETRIES" ] && [ -n "$LINK_ADVANCED_SLEEP_TIME" ]; then
-  # 获取最大重试次数
-  max_retries=$((LINK_ADVANCED_MAX_RETRIES == "0" ? 1 : LINK_ADVANCED_MAX_RETRIES))
-  # 获取休眠时间
-  sleep_time=$((LINK_ADVANCED_SLEEP_TIME == "0" ? 3 : LINK_ADVANCED_SLEEP_TIME))
-fi
+max_retries=$6
+sleep_time=$7
+retry_count=0
 
 # 初始化参数
-retry_count=0
 dns_type=$LINK_CLOUDFLARE_DDNS_TYPE
 dns_record_id=""
 
